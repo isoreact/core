@@ -1,0 +1,100 @@
+{
+  "name": "@isoreact/core",
+  "version": "0.0.0",
+  "description": "A library for making isomorphic React components with RxJS",
+  "author": "Steve Taylor",
+  "license": "MIT",
+  "repository": "isoreact/core",
+  "main": "dist/isoreact-core.cjs.js",
+  "module": "dist/isoreact-core.esm.js",
+  "browser": {
+    "./dist/isoreact-core.esm.js": "./dist/isoreact-core.browser.esm.js",
+    "./dist/isoreact-core.esm.min.js": "./dist/isoreact-core.browser.esm.min.js"
+  },
+  "publishConfig": {
+    "access": true
+  },
+  "scripts": {
+    "ci-cd": "echo 'CI-CD' && npm-run-all --silent clean --parallel ci-cd-*",
+    "ci-cd-test": "npm run test",
+    "ci-cd-build": "npm run build",
+    "clean": "echo 'CLEAN' && npm-run-all --silent --parallel clean-*",
+    "clean-coverage": "rimraf coverage",
+    "clean-dist": "rimraf dist",
+    "lint": "eslint src/**/*.js",
+    "test": "echo 'TEST' && cross-env NODE_ENV=test npm-run-all --silent test-*",
+    "test-audit": "npm audit",
+    "test-lint": "npm-run-all --silent lint",
+    "test-run": "cross-env NODE_ENV=development jest",
+    "build": "echo 'BUILD' && npm-run-all --silent --parallel build-*",
+    "build-rollup": "rollup -c"
+  },
+  "browserify": {
+    "transform": [
+      "babelify",
+      "envify"
+    ]
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text"
+    ],
+    "snapshotSerializers": [
+      "./test/serializers/render-to-html-serializer"
+    ]
+  },
+  "peerDependencies": {
+    "prop-types": "^15.6.2",
+    "react": "^16.4.0",
+    "react-dom": "^16.4.0",
+    "rxjs": "^6.2.1",
+    "styled-components": "^3.3.3"
+  },
+  "devDependencies": {
+    "babel-jest": "^23.4.0",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.1.0",
+    "eslint-plugin-filenames": "^1.3.2",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-react": "^7.10.0",
+    "fs-default-project-config": "^9.0.0",
+    "jest": "^23.4.1",
+    "npm-run-all": "^4.1.3",
+    "pretty": "^2.0.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.4.1",
+    "react-dom": "^16.4.1",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.63.4",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-plugin-sourcemaps": "^0.4.2",
+    "rollup-plugin-terser": "^1.0.1",
+    "rxjs": "^6.2.1",
+    "styled-components": "^3.3.3"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-eslint": "8.0.2",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-styled-components": "^1.5.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-minify": "^0.4.3",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "babelify": "^8.0.0",
+    "cuid": "^2.1.1",
+    "envify": "^4.1.0",
+    "object-hash": "^1.3.0"
+  }
+}

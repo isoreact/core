@@ -1,0 +1,33 @@
+import PropTypes from 'prop-types';
+import {of as observableOf} from 'rxjs';
+
+import hydrate from '../../../src/hydrate';
+import isomorphic from '../../../src/isomorphic';
+
+import VerySimple from '../components/very-simple';
+import VerySimpleContext from '../context/very-simple-context';
+
+const isoVerySimple = {
+    name: 'iso-very-simple',
+    component: VerySimple,
+    context: VerySimpleContext,
+    getData: (props) => {
+        const {power = 1} = props;
+
+        return observableOf({
+            props: {
+                x: 5 ** power,
+            },
+        });
+    },
+    loadingProp: 'isLoading',
+    propTypes: {
+        power: PropTypes.number,
+    },
+};
+
+export function hydrateVerySimple(options) {
+    hydrate(isoVerySimple, options);
+}
+
+export const IsoVerySimple = isomorphic(isoVerySimple);
