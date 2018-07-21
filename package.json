@@ -12,7 +12,7 @@
     "./dist/isoreact-core.esm.min.js": "./dist/isoreact-core.browser.esm.min.js"
   },
   "publishConfig": {
-    "access": true
+    "access": "public"
   },
   "scripts": {
     "ci-cd": "echo 'CI-CD' && npm-run-all --silent clean --parallel ci-cd-*",
