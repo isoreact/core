@@ -1,0 +1,25 @@
+{
+    "presets": [
+        "env",
+        "react"
+    ],
+    "plugins": [
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        [
+            "styled-components",
+            {
+                "ssr": true,
+                "displayName": true,
+                "fileName": false
+            }
+        ]
+    ],
+    "env": {
+        "production": {
+            "presets": [
+                "minify"
+            ]
+        }
+    }
+}
