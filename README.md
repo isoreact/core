@@ -14,6 +14,10 @@ Features:
 This is a library, not a framework. It is focused on state management and
 isomorphism and should otherwise stay out of your way.
 
+## Status
+
+**This is an early work in progress. It is not yet suitable for production!**
+
 ## Installation
 
 ```
@@ -212,10 +216,6 @@ async function renderUserProfilesPage(userIds) {
 
 This uses `StyledComponentsServerRenderer` as an alternative renderer, which uses `ServerStyleSheet` from
 styled-components to gather rendered stylesheets.
-
-## Status
-
-**This is an early work in progress. It is not yet suitable for production!**
 
 ## Contributing
 
