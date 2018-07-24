@@ -13,13 +13,13 @@ export default [
 ].reduce((acc, {target, format}) => [
     ...acc,
     ...[
-        {environment: 'development'},
-        {environment: 'production'},
-    ].map(({environment, minify}) => ({
+        'development',
+        'production',
+    ].map((environment) => ({
         input: './src/index.js',
         output: {
             format,
-            sourcemap: minify,
+            sourcemap: true,
             globals: {
                 'react': 'React',
                 'react-dom': 'ReactDOM',
