@@ -3,26 +3,25 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
 import sourceMaps from 'rollup-plugin-sourcemaps';
-import {terser} from 'rollup-plugin-terser';
 
 import pkg from './package.json';
 
 export default [
-    {target: 'server', format: 'esm', minifyProduction: true},
-    {target: 'server', format: 'cjs', minifyProduction: false},
-    {target: 'browser', format: 'esm', minifyProduction: true},
-].reduce((acc, {target, format, minifyProduction}) => [
+    {target: 'server', format: 'esm'},
+    {target: 'server', format: 'cjs'},
+    {target: 'browser', format: 'esm'},
+].reduce((acc, {target, format}) => [
     ...acc,
     ...[
-        {environment: 'development', minify: false},
-        {environment: 'production', minify: minifyProduction},
+        {environment: 'development'},
+        {environment: 'production'},
     ].map(({environment, minify}) => ({
-        input: `./src/${target}.js`,
+        input: './src/index.js',
         output: {
             format,
             sourcemap: minify,
             globals: {
-                react: 'React',
+                'react': 'React',
                 'react-dom': 'ReactDOM',
                 'react-dom/server': 'ReactDOMServer',
             },
@@ -30,12 +29,14 @@ export default [
                 'dist/isoreact-core',
                 target,
                 format,
-                minify ? 'min.js' : 'js',
+                'js',
             ].join('.'),
         },
         plugins: [
             sourceMaps(),
-            nodeResolve(),
+            nodeResolve({
+                browser: target === 'browser',
+            }),
             babel({
                 babelrc: false,
                 presets: [
@@ -43,8 +44,8 @@ export default [
                         'env',
                         {
                             modules: false,
-                            targets: target === 'server ' ? {node: '10.0'} : {browsers: ['last 2 versions']}
-                        }
+                            targets: target === 'server ' ? {node: '10.0'} : {browsers: ['last 2 versions']},
+                        },
                     ],
                     'react',
                 ],
@@ -53,12 +54,12 @@ export default [
                     'transform-class-properties',
                     'external-helpers',
                     [
-                        "styled-components",
+                        'styled-components',
                         {
-                            "ssr": true,
-                            "displayName": true,
-                            "fileName": false
-                        }
+                            ssr: true,
+                            displayName: true,
+                            fileName: false,
+                        },
                     ],
                 ].filter(Boolean),
                 exclude: 'node_modules/**',
@@ -69,7 +70,6 @@ export default [
                 'process.server': (target === 'server').toString(),
                 'process.env.NODE_ENV': `"${environment}"`,
             }),
-            ...(minify ? [terser({sourceMap: true})] : []),
         ],
         external: [
             // Top-level peerDependencies modules
@@ -83,5 +83,5 @@ export default [
             'crypto',
             'os',
         ],
-    }))
+    })),
 ], []);

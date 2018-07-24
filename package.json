@@ -7,10 +7,7 @@
   "repository": "isoreact/core",
   "main": "dist/isoreact-core.server.cjs.js",
   "module": "dist/isoreact-core.server.esm.js",
-  "browser": {
-    "./dist/isoreact-core.esm.js": "./dist/isoreact-core.browser.esm.js",
-    "./dist/isoreact-core.esm.min.js": "./dist/isoreact-core.browser.esm.min.js"
-  },
+  "browser": "dist/isoreact-core.browser.esm.js",
   "files": [
     "dist/"
   ],
@@ -80,7 +77,6 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-replace": "^2.0.0",
     "rollup-plugin-sourcemaps": "^0.4.2",
-    "rollup-plugin-terser": "^1.0.1",
     "rxjs": "^6.2.1",
     "styled-components": "^3.3.3"
   },
