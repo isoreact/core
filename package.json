@@ -5,8 +5,8 @@
   "author": "Steve Taylor",
   "license": "MIT",
   "repository": "isoreact/core",
-  "main": "dist/isoreact-core.cjs.js",
-  "module": "dist/isoreact-core.esm.js",
+  "main": "dist/isoreact-core.server.cjs.js",
+  "module": "dist/isoreact-core.server.esm.js",
   "browser": {
     "./dist/isoreact-core.esm.js": "./dist/isoreact-core.browser.esm.js",
     "./dist/isoreact-core.esm.min.js": "./dist/isoreact-core.browser.esm.min.js"
