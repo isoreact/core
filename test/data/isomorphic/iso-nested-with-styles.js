@@ -51,11 +51,11 @@ const isoNestedWithStyles = {
     loadingProp: 'isLoading',
     propTypes: {
         coefficient: PropTypes.number,
-    }
+    },
 };
 
-export function hydrateNestedWithStyles(options) {
-    hydrate(isoNestedWithStyles, options);
-}
-
 export const IsoNestedWithStyles = isomorphic(isoNestedWithStyles);
+
+export function hydrateNestedWithStyles(options) {
+    hydrate(IsoNestedWithStyles, options);
+}

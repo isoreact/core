@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {BrowserContext} from './context';
-import isomorphic from './isomorphic';
 import hasValueNow from './has-value-now';
 
 /**
@@ -10,31 +9,26 @@ import hasValueNow from './has-value-now';
  *
  * window.__ISO_DATA__[name][elementId]
  *
- * @param {Object}                   isomorphicComponent             - isomorphic component details
- * @param {string}                   isomorphicComponent.name        - name
- * @param {Function|React.Component} isomorphicComponent.component   - React component
- * @param {React.Context}            isomorphicComponent.context     - context to provide and consume the data stream
- * @param {getData}                  isomorphicComponent.getData     - data stream creation function
- * @param {String}                   isomorphicComponent.loadingProp - the name of the flag to toggle when loading/completed
+ * @param {Object}                   IsomorphicComponent             - isomorphic React component created with <code>isomorphic</code>
  * @param {Object}                   [options]                       - options (see below)
  * @param {Boolean}                  [options.warnIfNotFound=false]  - whether or not to warn if the dehydrated isomorphic component is not found
  * @param {Boolean}                  [options.warnIfAlreadyHydrated] - whether or not to warn if the isomorphic component has already been hydrated
  * @returns {undefined}
  */
 export default function hydrate(
-    {
-        name,
-        component,
-        context,
-        getData,
-        loadingProp,
-    },
+    IsomorphicComponent,
     {
         warnIfNotFound = false,
         warnIfAlreadyHydrated = true,
     } = {}
 ) {
     if (!process.browser) {
+        return;
+    }
+
+    if (!IsomorphicComponent.__isomorphic_config__) {
+        console.error('Cannot hydrate a non-isomorphic component');
+
         return;
     }
 
@@ -48,6 +42,7 @@ export default function hydrate(
         return;
     }
 
+    const {name} = IsomorphicComponent.__isomorphic_config__;
     const componentHydrations = isoData[name];
 
     if (!componentHydrations) {
@@ -83,7 +78,7 @@ export default function hydrate(
         try {
             const {props, hydration} = elementHydration;
 
-            hydrateElement({name, component, context, getData, loadingProp}, {element, props, hydration});
+            hydrateElement({IsomorphicComponent, element, props, hydration});
             elementHydration.hydrated = true;
         } catch (error) {
             console.error(`Component "#${elementId}" with name "${name}" threw an error while hydrating.`);
@@ -97,23 +92,17 @@ export default function hydrate(
 // Hydrate a single element
 function hydrateElement(
     {
-        name,
-        component,
-        context,
-        getData,
-        loadingProp,
-    },
-    {
+        IsomorphicComponent,
         element,
         props,
         hydration,
     }
 ) {
+    const {name, getData} = IsomorphicComponent.__isomorphic_config__;
+
     if (process.env.NODE_ENV === 'development') {
         console.info(`Hydrating component "${name}"...`); // eslint-disable-line no-console
     }
-
-    const IsomorphicComponent = isomorphic({name, component, context, getData, loadingProp});
 
     // Ensure hydration (or rendering) happens immediately.
     if (!hasValueNow(getData(props, hydration))) {

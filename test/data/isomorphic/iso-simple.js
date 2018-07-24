@@ -46,8 +46,8 @@ const isoSimple = {
     },
 };
 
-export function hydrateSimple(options) {
-    hydrate(isoSimple, options);
-}
-
 export const IsoSimple = isomorphic(isoSimple);
+
+export function hydrateSimple(options) {
+    hydrate(IsoSimple, options);
+}

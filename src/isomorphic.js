@@ -109,7 +109,14 @@ export default function isomorphic({
         }
     };
 
-    isoComponent.__isomorphic_name__ = name;
+    isoComponent.__isomorphic_config__ = {
+        name,
+        component: Component,
+        context: Context,
+        getData,
+        loadingProp,
+        propTypes,
+    };
 
     if (process.env.NODE_ENV === 'development') {
         isoComponent.propTypes = propTypes;

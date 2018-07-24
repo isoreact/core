@@ -26,8 +26,8 @@ const isoVerySimple = {
     },
 };
 
-export function hydrateVerySimple(options) {
-    hydrate(isoVerySimple, options);
-}
-
 export const IsoVerySimple = isomorphic(isoVerySimple);
+
+export function hydrateVerySimple(options) {
+    hydrate(IsoVerySimple, options);
+}

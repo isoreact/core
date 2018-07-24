@@ -98,7 +98,7 @@ import profileContext from './profile-context';
 import fetchName from './streams/fetch-name';
 import fetchPhoto from './streams/fetch-photo';
 
-export const isoProfileDefinition = {
+const IsoProfile = isomorphic({
     name: 'iso-profile',
     component: Profile,
     context: profileContext,
@@ -135,9 +135,9 @@ export const isoProfileDefinition = {
     propTypes: {
         userId: PropType.string.isRequired,
     },
-};
+});
 
-export const IsoProfile = isomorphic(isoProfileDefinition);
+export default IsoProfile;
 ```
 
 The general contract of `getData(props, hydration)` is:
@@ -178,10 +178,10 @@ Somewhere on the client:
 
 ```js
 import {hydrate} from '@isoreact/core';
-import {isoProfileDefinition} from './iso-profile';
+import IsoProfile from './iso-profile';
 
 // Hydrate all instances of iso-profile on the page
-hydrate(isoProfileDefinition);
+hydrate(IsoProfile);
 ```
 
 When `hydrate` is called, it finds all the server-side rendered instances of the isomorphic component in the DOM, reads

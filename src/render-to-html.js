@@ -33,10 +33,10 @@ export default async function renderToHtml(
         className,
     } = {}
 ) {
-    const {__isomorphic_name__: isomorphicName} = isomorphicElement.type;
+    const {__isomorphic_config__: isomorphicConfig} = isomorphicElement.type;
 
     // If this isn't an isomorphic component, rather than crapping out, just render it as a plain component.
-    if (!isomorphicName) {
+    if (!isomorphicConfig) {
         const renderer = new ServerRenderer();
 
         renderer.render(isomorphicElement);
@@ -108,7 +108,7 @@ export default async function renderToHtml(
         body: [
             `<div id="${id}"${className ? ` class="${className}"` : ''}>${bodyHtml}</div>`,
             '<script type="text/javascript">',
-            `Object.assign(["__ISO_DATA__","${isomorphicName}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
+            `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
             '</script>',
         ].join(''),
     };

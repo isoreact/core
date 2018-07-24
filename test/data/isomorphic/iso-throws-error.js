@@ -22,8 +22,8 @@ const isoThrowsError = {
     },
 };
 
-export function hydrateThrowsError(options) {
-    hydrate(isoThrowsError, options);
-}
-
 export const IsoThrowsError = isomorphic(isoThrowsError);
+
+export function hydrateThrowsError(options) {
+    hydrate(IsoThrowsError, options);
+}
