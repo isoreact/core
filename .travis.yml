@@ -6,6 +6,7 @@ cache:
   - node_modules
 before_deploy: "npm run ci-cd"
 deploy:
+  skip_cleanup: true
   provider: npm
   email: mail@steve-taylor.org
   api_key:
