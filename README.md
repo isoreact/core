@@ -1,4 +1,4 @@
-# IsoReact &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/isoreact/core/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/@isoreact/core.svg?style=flat)](https://www.npmjs.com/package/@isoreact/core) [![Build Status](https://travis-ci.org/isoreact/core.svg?branch=develop)](https://travis-ci.org/isoreact/core) [![PRs Welcome](https://img.shields.io/badge/pull_requests-welcome-brightgreen.svg)](https://github.com/isoreact/core/blob/master/CONTRIBUTING.md)
+# IsoReact &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/isoreact/core/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/@isoreact/core.svg?style=flat)](https://www.npmjs.com/package/@isoreact/core) ![npm](https://img.shields.io/npm/dw/@isoreact/core.svg) [![Build Status](https://travis-ci.org/isoreact/core.svg?branch=develop)](https://travis-ci.org/isoreact/core) [![Gitter](https://img.shields.io/gitter/room/isoreact-core/isoreact.svg)](https://gitter.im/isoreact-core/isoreact) [![PRs Welcome](https://img.shields.io/badge/pull_requests-welcome-brightgreen.svg)](https://github.com/isoreact/core/blob/master/CONTRIBUTING.md)
 
 IsoReact is a small library to use React and RxJS together to build isomorphic
 React components.
@@ -23,6 +23,10 @@ isomorphism and should otherwise stay out of your way.
 ```
 npm i -S @isoreact/core
 ```
+
+## Examples
+
+See [isoreact/example](https://github.com/isoreact/example)
 
 ## Usage
 
