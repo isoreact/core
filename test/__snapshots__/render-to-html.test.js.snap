@@ -23,11 +23,11 @@ exports[`renderToHtml(isomorphicComponent) nested isomorphic component renders c
         "coefficient": 9
       },
       "hydration": {
-        "iso-nested--2b1c3f975f963b3b383915d72886130d868bf0f5f7e0b5dc58cba04f8581e3f4": {
+        "iso-nested--55fa1adb27dccf36b9460eaeb0421f3141422e12b248273991e4727dc2645cb0": {
           "v": 3,
           "w": 8
         },
-        "iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107": {
+        "iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d": {
           "baseValue": 5
         }
       }
@@ -71,7 +71,7 @@ exports[`renderToHtml(isomorphicComponent) simple isomorphic component with moun
         "power": 4
       },
       "hydration": {
-        "iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107": {
+        "iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d": {
           "baseValue": 5
         }
       }
@@ -95,7 +95,7 @@ exports[`renderToHtml(isomorphicComponent) simple isomorphic component without m
         "power": 4
       },
       "hydration": {
-        "iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107": {
+        "iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d": {
           "baseValue": 5
         }
       }
@@ -144,11 +144,11 @@ exports[`renderToHtml(isomorphicComponent) styled nested isomorphic component re
         "coefficient": 9
       },
       "hydration": {
-        "iso-nested-with-styles--2b1c3f975f963b3b383915d72886130d868bf0f5f7e0b5dc58cba04f8581e3f4": {
+        "iso-nested-with-styles--55fa1adb27dccf36b9460eaeb0421f3141422e12b248273991e4727dc2645cb0": {
           "v": 3,
           "w": 8
         },
-        "iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107": {
+        "iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d": {
           "baseValue": 5
         }
       }

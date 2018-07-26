@@ -36,6 +36,7 @@ export default [
             sourceMaps(),
             nodeResolve({
                 browser: target === 'browser',
+                preferBuiltins: target === 'server',
             }),
             babel({
                 babelrc: false,

@@ -1,4 +1,13 @@
-import hash from 'object-hash';
+import objectSorter from 'node-object-hash/objectSorter';
+import sha256 from 'hash.js/lib/hash/sha/256';
+
+const sortObject = objectSorter();
+
+const hashObject = (props) => (
+    sha256()
+        .update(sortObject(props))
+        .digest('hex')
+);
 
 /**
  * Generate a <code>hydration</code> key based on an isomorphic component name and the props of one of its instances
@@ -9,5 +18,5 @@ import hash from 'object-hash';
  * @return {string} the hydration key
  */
 export default function keyFor(name, props) {
-    return `${name}--${hash(props, {algorithm: 'sha256'})}`;
+    return `${name}--${hashObject(props)}`;
 }

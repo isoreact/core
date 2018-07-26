@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import hydrate from '../src/hydrate';
+
 import {hydrateSimple} from './data/isomorphic/iso-simple';
 import {hydrateNested} from './data/isomorphic/iso-nested';
 import {hydrateVerySimple} from './data/isomorphic/iso-very-simple';
@@ -28,7 +30,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
 
     describe('simple isomorphic component', () => {
         let fetchBaseValueSpy;
-        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
 
         beforeEach(() => {
             fetchBaseValueSpy = jest.spyOn(fetchBaseValue, 'default');
@@ -65,7 +67,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
         let fetchBaseValueSpy;
         let fetchVSpy;
         let fetchWSpy;
-        const html = '<div id="fedcba9876543210"><section><ul><li>27</li><li>72</li><li><section>625</section></li></ul></section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-nested","fedcba9876543210"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"coefficient":9},"hydration":{"iso-nested--2b1c3f975f963b3b383915d72886130d868bf0f5f7e0b5dc58cba04f8581e3f4":{"v":3,"w":8},"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="fedcba9876543210"><section><ul><li>27</li><li>72</li><li><section>625</section></li></ul></section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-nested","fedcba9876543210"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"coefficient":9},"hydration":{"iso-nested--55fa1adb27dccf36b9460eaeb0421f3141422e12b248273991e4727dc2645cb0":{"v":3,"w":8},"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
 
         beforeEach(() => {
             fetchBaseValueSpy = jest.spyOn(fetchBaseValue, 'default');
@@ -107,7 +109,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
         let fetchVSpy;
         let fetchWSpy;
         const head = '<style data-styled-components="lmVDjZ eNTiKw">/* sc-component-id: StyledSection-semgqu-0 */.lmVDjZ{padding:7px;background:#bbb;}/* sc-component-id: StyledList-semgqu-1 */.eNTiKw{margin:7px;background:#666;color:#ddd;}</style>';
-        const body = '<div id="0123456789abcdef"><section class="StyledSection-semgqu-0 lmVDjZ"><ul class="StyledList-semgqu-1 eNTiKw"><li>27</li><li>72</li><li><section>625</section></li></ul></section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-nested-with-styles","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"coefficient":9},"hydration":{"iso-nested-with-styles--2b1c3f975f963b3b383915d72886130d868bf0f5f7e0b5dc58cba04f8581e3f4":{"v":3,"w":8},"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const body = '<div id="0123456789abcdef"><section class="StyledSection-semgqu-0 lmVDjZ"><ul class="StyledList-semgqu-1 eNTiKw"><li>27</li><li>72</li><li><section>625</section></li></ul></section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-nested-with-styles","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"coefficient":9},"hydration":{"iso-nested-with-styles--55fa1adb27dccf36b9460eaeb0421f3141422e12b248273991e4727dc2645cb0":{"v":3,"w":8},"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
 
         beforeEach(() => {
             fetchBaseValueSpy = jest.spyOn(fetchBaseValue, 'default');
@@ -325,7 +327,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
 
     describe('__ISO_DATA__ component entry already hydrated', () => {
         describe('with warnings', () => {
-            const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+            const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
             let originalConsoleWarn;
             let consoleWarnSpy;
 
@@ -361,7 +363,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
         });
 
         describe('without warnings', () => {
-            const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+            const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
             let originalConsoleWarn;
             let consoleWarnSpy;
 
@@ -394,7 +396,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
     });
 
     describe('__ISO_DATA__ component instance already hydrated', () => {
-        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
         let originalConsoleError;
         let consoleErrorSpy;
 
@@ -430,7 +432,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
     });
 
     describe('__ISO_DATA__ component instance mount point not found', () => {
-        const html = '<div id="fedcba9876543210"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="fedcba9876543210"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
         let originalConsoleError;
         let consoleErrorSpy;
 
@@ -464,8 +466,40 @@ describe('hydrate(isomorphicComponent, options)', () => {
         });
     });
 
+    describe('non-isomorphic component', () => {
+        let originalConsoleError;
+        let consoleErrorSpy;
+
+        beforeEach(() => {
+            originalConsoleError = console.error;
+            console.error = () => {};
+            consoleErrorSpy = jest.spyOn(console, 'error');
+
+            const Component = ({children}) => (<div>{children}</div>);
+
+            hydrate(Component);
+        });
+
+        afterEach(() => {
+            consoleErrorSpy.mockRestore();
+            console.error = originalConsoleError;
+        });
+
+        test('generates an error message', () => {
+            expect(consoleErrorSpy.mock.calls).toHaveLength(1);
+        });
+
+        test('generates an error message to say that non-isomorphic components cannot be hydrated', () => {
+            expect(consoleErrorSpy.mock.calls[0][0]).toBe('Cannot hydrate a non-isomorphic component');
+        });
+
+        test('does not change the DOM', () => {
+            expect(document.body.innerHTML).toBe('');
+        });
+    });
+
     describe('hydrateElement throws an error', () => {
-        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
         let originalConsoleError;
         let consoleErrorSpy;
 
@@ -473,7 +507,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
         let error;
 
         beforeEach(() => {
-            originalConsoleError = console.warn;
+            originalConsoleError = console.error;
             console.error = () => {};
             consoleErrorSpy = jest.spyOn(console, 'error');
 
@@ -520,7 +554,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
     });
 
     describe('server', () => {
-        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--2bc503c2a073d8b6c93b14fe5e8b6486a36f8a3d04de79f13c5dc02af4f5b107":{"baseValue":5}}});</script>';
+        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{"iso-simple--cfa18ab5e5bfacba47b0cf02f2721b037b0e74dc6fcedc1f0fac019a83c36d6d":{"baseValue":5}}});</script>';
         let originalProcessBrowser;
 
         beforeEach(() => {

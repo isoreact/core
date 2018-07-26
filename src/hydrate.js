@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import {BrowserContext} from './context';
+import {HydrationContext} from './context';
 import hasValueNow from './has-value-now';
+import keyFor from './key-for';
 
 /**
  * Hydrate all dehydrated instances of the specified isomorphic component, returning a <code>Promise</code>.
@@ -117,16 +118,14 @@ function hydrateElement(
     if (hydration) {
         // If we have initial data, hydrate the server-rendered component
         ReactDOM.hydrate((
-            <BrowserContext.Provider value={(key) => hydration[key]}>
+            <HydrationContext.Provider value={(name, props) => hydration[keyFor(name, props)]}>
                 <IsomorphicComponent {...props} />
-            </BrowserContext.Provider>
+            </HydrationContext.Provider>
         ), element);
     } else {
         // If we don't have initial data, render over the top of anything currently in the element.
         ReactDOM.render((
-            <BrowserContext.Provider value={() => {}}>
-                <IsomorphicComponent {...props} />
-            </BrowserContext.Provider>
+            <IsomorphicComponent {...props} />
         ), element);
     }
 

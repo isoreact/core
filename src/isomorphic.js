@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import {first, map, shareReplay} from 'rxjs/operators';
 
-import {ServerContext, BrowserContext} from './context';
+import {ServerContext, HydrationContext} from './context';
 import hasValueNow from './has-value-now';
 import keyFor from './key-for';
 
@@ -38,31 +38,30 @@ export default function isomorphic({
         children, // eslint-disable-line no-unused-vars
         ...props
     }) => {
-        const key = keyFor(name, props);
-
         if (process.browser) {
             return (
-                <BrowserContext.Consumer>
+                <HydrationContext.Consumer>
                     {(getHydration) => (
                         <Context.Provider
                             value={{
-                                data$: getData(props, getHydration(key), true).pipe(map(({props}) => props)),
+                                data$: getData(props, getHydration(name, props)).pipe(map(({props}) => props)),
                                 loadingProp,
                             }}
                         >
                             <Component />
                         </Context.Provider>
                     )}
-                </BrowserContext.Consumer>
+                </HydrationContext.Consumer>
             );
         } else {
             return (
                 <ServerContext.Consumer>
                     {({getStream, registerStream}) => {
+                        const key = keyFor(name, props);
                         let stream$ = getStream(key);
 
                         if (!stream$) {
-                            stream$ = getData(props, undefined, false);
+                            stream$ = getData(props, undefined);
                             registerStream(key, stream$);
                         }
 
