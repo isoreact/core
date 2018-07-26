@@ -45,7 +45,10 @@ import profileContext from './profile-context';
 
 const ProfileName = () => (
     <section className="profile__name">
-        <Connect context={profileContext}>
+        <Connect
+            context={profileContext}
+            distinctBy={({name}) => name}
+        >
             {({name}) => name}
         </Connect>
     </section>
@@ -84,6 +87,8 @@ const Profile = () => (
 
 export default Profile;
 ```
+
+You might have noticed `distinctBy={({name) => name}` in one of the `<Connect />` elements. It's an optional function that uniquely identifies values we're interested in, which is used by `Connect` to skip duplicate values and therefore duplicate renders.
 
 Define your component's event stream and make it isomorphic:
 
