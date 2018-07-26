@@ -44,21 +44,21 @@ import {Connect} from '@isoreact/core';
 import profileContext from './profile-context';
 
 const ProfileName = () => (
-    <Connect context={profileContext}>
-        <section className="profile__name">
+    <section className="profile__name">
+        <Connect context={profileContext}>
             {({name}) => name}
-        </section>
-    </Connect>
+        </Connect>
+    </section>
 );
 
 const ProfilePhoto = () => (
-    <Connect context={profileContext}>
-        <section className="profile__photo">
+    <section className="profile__photo">
+        <Connect context={profileContext}>
             {({photo}) => (
                 <img className="profile__photo-img" src={photo} />
             )}
-        </section>
-    </Connect>
+        </Connect>
+    </section>
 );
 
 const ProfileLoading = () => (
