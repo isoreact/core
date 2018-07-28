@@ -64,7 +64,6 @@ export default async function renderToHtml(
 
     let error;
     const onError = (e) => {
-        console.log('Error caught!', e); // eslint-disable-line
         error = e;
     };
 
