@@ -6,10 +6,7 @@ import cuid from 'cuid';
 
 import {ServerContext} from './context';
 
-const defaultRender = (reactElement) => ({
-    head: '',
-    body: ReactDOMServer.renderToString(reactElement),
-});
+const defaultRender = ReactDOMServer.renderToString;
 
 /**
  * Asynchronously render a React component to HTML, also rendering a script tag that stores <code>props</code> and
@@ -19,8 +16,7 @@ const defaultRender = (reactElement) => ({
  * @param {Object}   [options]                - (see below)
  * @param {Function} [options.render]         - an optional alternative server renderer
  * @param {string}   [options.className]      - an optional class name for the mount point
- * @returns {Promise.<{head: string, body: string}>} a promise that will resolve to the element's body HTML and any
- *                                                   supporting head HTML
+ * @returns {Promise.<string>} a promise that will resolve to the element's HTML
  */
 export default async function renderToHtml(
     isomorphicElement,
@@ -33,12 +29,7 @@ export default async function renderToHtml(
 
     // If this isn't an isomorphic component, rather than crapping out, just render it as a plain component.
     if (!isomorphicConfig) {
-        const {head, body} = render(isomorphicElement);
-
-        return {
-            head,
-            body: `<div${className ? ` class="${className}"` : ''}>${body}</div>`,
-        };
+        return `<div${className ? ` class="${className}"` : ''}>${render(isomorphicElement)}</div>`;
     }
 
     const registeredStreams = {};
@@ -102,7 +93,7 @@ export default async function renderToHtml(
     } while (pendingKeys.size);
 
     // Now that everything is resolved, synchronously render the html.
-    const {head, body} = render((
+    const html = render((
         <ServerContext.Provider value={{getStream}}>
             {isomorphicElement}
         </ServerContext.Provider>
@@ -111,13 +102,10 @@ export default async function renderToHtml(
     const id = cuid();
 
     // Return the component HTML and some JavaScript to store props and initial data.
-    return {
-        head,
-        body: [
-            `<div id="${id}"${className ? ` class="${className}"` : ''}>${body}</div>`,
-            '<script type="text/javascript">',
-            `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
-            '</script>',
-        ].join(''),
-    };
+    return [
+        `<div id="${id}"${className ? ` class="${className}"` : ''}>${html}</div>`,
+        '<script type="text/javascript">',
+        `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
+        '</script>',
+    ].join('');
 }

@@ -168,12 +168,12 @@ import {IsoProfile} from './iso-profile';
 
 // Server-side render an HTML page consisting of the profiles from a list of user IDs.
 async function renderUserProfilesPage(userIds) {
-    // Generate server-side rendered profile of user 123
+    // Generate server-side rendered profile of users
     const htmlArray = await Promise.all(
         userIds.map((userId) => renderToHtml(<IsoProfile userId={userId} />))
     );
 
-    return `<body>${htmlArray.map(({body}) => body)}</body>`;
+    return `<body>${htmlArray.join('')}</body>`;
 }
 ```
 
@@ -211,15 +211,16 @@ import {IsoProfile} from './iso-profile';
 
 // Server-side render an HTML page consisting of the profiles from a list of user IDs.
 async function renderUserProfilesPage(userIds) {
-    // Generate server-side rendered profile of user 123
+    // Generate server-side rendered profile of users
+    const renderer = new StyledComponentsServerRenderer();
     const htmlArray = await Promise.all(
         userIds.map((userId) => renderToHtml(
             <IsoProfile userId={userId} />,
-            {serverRenderer: StyledComponentsServerRenderer}
+            {renderer}
         ))
     );
 
-    return `<head>${htmlArray.map(({head}) => head)}</head><body>${htmlArray.map(({body}) => body)}</body>`;
+    return `<head>${renderer.getStyleTags()}</head><body>${htmlArray.join('')}</body>`;
 }
 ```
 

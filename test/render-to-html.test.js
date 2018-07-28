@@ -2,7 +2,7 @@ import React from 'react';
 import {__DO_NOT_USE_OR_YOU_WILL_BE_HAUNTED_BY_SPOOKY_GHOSTS} from 'styled-components';
 
 import renderToHtml from '../src/render-to-html';
-import styledComponentsRenderToHtml from '../src/styled-components-render-to-html';
+import StyledComponentsServerRenderer from '../src/styled-components-server-renderer';
 
 import {IsoSimple} from './data/isomorphic/iso-simple';
 import {IsoNested} from './data/isomorphic/iso-nested';
@@ -45,7 +45,7 @@ describe('renderToHtml(isomorphicComponent)', () => {
 
         describe('with mount point className', () => {
             beforeEach(async () => {
-                html = await renderToHtml(<IsoSimple power={4} />, {className: 'mount-point'});
+                html = {body: await renderToHtml(<IsoSimple power={4} />, {className: 'mount-point'})};
             });
 
             test('renders correctly', () => {
@@ -59,7 +59,7 @@ describe('renderToHtml(isomorphicComponent)', () => {
 
         describe('without mount point className', () => {
             beforeEach(async () => {
-                html = await renderToHtml(<IsoSimple power={4} />);
+                html = {body: await renderToHtml(<IsoSimple power={4} />)};
             });
 
             test('renders correctly', () => {
@@ -82,7 +82,7 @@ describe('renderToHtml(isomorphicComponent)', () => {
             fetchBaseValueSpy = jest.spyOn(fetchBaseValue, 'default');
             fetchVSpy = jest.spyOn(fetchV, 'default');
             fetchWSpy = jest.spyOn(fetchW, 'default');
-            html = await renderToHtml(<IsoNested coefficient={9} />);
+            html = {body: await renderToHtml(<IsoNested coefficient={9} />)};
         });
 
         afterEach(() => {
@@ -121,10 +121,13 @@ describe('renderToHtml(isomorphicComponent)', () => {
         });
 
         test('renders correctly', async () => {
-            expect(await renderToHtml(
+            const renderer = new StyledComponentsServerRenderer();
+            const body = await renderToHtml(
                 <IsoNestedWithStyles coefficient={9} />,
-                {render: styledComponentsRenderToHtml}
-            ))
+                {render: new StyledComponentsServerRenderer().render}
+            );
+
+            expect({head: renderer.getStyleTags(), body})
                 .toMatchSnapshot();
         });
     });
@@ -132,13 +135,13 @@ describe('renderToHtml(isomorphicComponent)', () => {
     describe('non-isomorphic component', () => {
         describe('with mount point className', () => {
             test('renders as a regular element', async () => {
-                expect(await renderToHtml(<div>Hello ;)</div>)).toMatchSnapshot();
+                expect({body: await renderToHtml(<div>Hello ;)</div>)}).toMatchSnapshot();
             });
         });
 
         describe('without mount point className', () => {
             test('renders as a regular element', async () => {
-                expect(await renderToHtml(<div>Hello ;)</div>, {className: 'mount-point'})).toMatchSnapshot();
+                expect({body: await renderToHtml(<div>Hello ;)</div>, {className: 'mount-point'})}).toMatchSnapshot();
             });
         });
     });
