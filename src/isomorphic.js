@@ -34,92 +34,93 @@ export default function isomorphic({
     loadingProp,
     propTypes, // eslint-disable-line react/forbid-foreign-prop-types
 }) {
-    const isoComponent = ({
-        children, // eslint-disable-line no-unused-vars
-        ...props
-    }) => {
-        if (process.browser) {
-            return (
-                <HydrationContext.Consumer>
-                    {(getHydration) => (
-                        <Context.Provider
-                            value={{
-                                data$: getData(props, getHydration(name, props)).pipe(map(({props}) => props)),
-                                loadingProp,
-                            }}
-                        >
-                            <Component />
-                        </Context.Provider>
-                    )}
-                </HydrationContext.Consumer>
-            );
-        } else {
-            return (
-                <ServerContext.Consumer>
-                    {({getStream, registerStream}) => {
-                        const key = keyFor(name, props);
-                        let stream$ = getStream(key);
+    return class Isomorphic extends React.Component {
+        static __isomorphic_config__ = { // eslint-disable-line camelcase
+            name,
+            component: Component,
+            context: Context,
+            getData,
+            loadingProp,
+            propTypes,
+        };
 
-                        if (!stream$) {
-                            stream$ = getData(props, undefined);
-                            registerStream(key, stream$);
-                        }
+        static displayName = name;
 
-                        // If the stream is resolved, render it.
-                        if (hasValueNow(stream$)) {
-                            return (
-                                <Context.Provider
-                                    value={{
-                                        data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
-                                        loadingProp,
-                                    }}
-                                >
-                                    <Component />
-                                </Context.Provider>
-                            );
-                        }
+        static propTypes = propTypes;
 
-                        // When the stream resolves later, continue walking the tree. (Also, the registerStream function can detect this condition.)
-                        stream$
-                            .pipe(first())
-                            .toPromise()
-                            .then(() => {
-                                ReactDOMServer.renderToStaticMarkup(
-                                    <ServerContext.Provider value={{getStream, registerStream}}>
-                                        <Context.Provider
-                                            value={{
-                                                data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
-                                                loadingProp,
-                                            }}
-                                        >
-                                            <Component />
-                                        </Context.Provider>
-                                    </ServerContext.Provider>
+        shouldComponentUpdate() {
+            return false;
+        }
+
+        render() {
+            const {children, ...props} = this.props; // eslint-disable-line no-unused-vars, react/prop-types
+
+            if (process.browser) {
+                return (
+                    <HydrationContext.Consumer>
+                        {(getHydration) => (
+                            <Context.Provider
+                                value={{
+                                    data$: getData(props, getHydration(name, props)).pipe(map(({props}) => props)),
+                                    loadingProp,
+                                }}
+                            >
+                                <Component />
+                            </Context.Provider>
+                        )}
+                    </HydrationContext.Consumer>
+                );
+            } else {
+                return (
+                    <ServerContext.Consumer>
+                        {({getStream, registerStream, onError}) => {
+                            const key = keyFor(name, props);
+                            let stream$ = getStream(key);
+
+                            if (!stream$) {
+                                stream$ = getData(props, undefined);
+                                registerStream(key, stream$);
+                            }
+
+                            // If the stream is resolved, render it.
+                            if (hasValueNow(stream$)) {
+                                return (
+                                    <Context.Provider
+                                        value={{
+                                            data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
+                                            loadingProp,
+                                        }}
+                                    >
+                                        <Component />
+                                    </Context.Provider>
                                 );
-                            })
-                            .catch(() => {
-                                // This will also be caught in renderToHtml and is better handled there.
-                            });
+                            }
 
-                        return null;
-                    }}
-                </ServerContext.Consumer>
-            );
+                            // When the stream resolves later, continue walking the tree.
+                            stream$
+                                .pipe(first())
+                                .toPromise()
+                                .then(() => {
+                                    ReactDOMServer.renderToStaticMarkup(
+                                        <ServerContext.Provider value={{getStream, registerStream}}>
+                                            <Context.Provider
+                                                value={{
+                                                    data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
+                                                    loadingProp,
+                                                }}
+                                            >
+                                                <Component />
+                                            </Context.Provider>
+                                        </ServerContext.Provider>
+                                    );
+                                })
+                                .catch((error) => {
+                                    onError(error);
+                                });
+                        }}
+                    </ServerContext.Consumer>
+                );
+            }
         }
     };
-
-    isoComponent.__isomorphic_config__ = {
-        name,
-        component: Component,
-        context: Context,
-        getData,
-        loadingProp,
-        propTypes,
-    };
-
-    if (process.env.NODE_ENV === 'development') {
-        isoComponent.propTypes = propTypes;
-    }
-
-    return isoComponent;
 }

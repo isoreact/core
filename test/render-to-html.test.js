@@ -2,7 +2,7 @@ import React from 'react';
 import {__DO_NOT_USE_OR_YOU_WILL_BE_HAUNTED_BY_SPOOKY_GHOSTS} from 'styled-components';
 
 import renderToHtml from '../src/render-to-html';
-import StyledComponentsServerRenderer from '../src/styled-components-server-renderer';
+import styledComponentsRenderToHtml from '../src/styled-components-render-to-html';
 
 import {IsoSimple} from './data/isomorphic/iso-simple';
 import {IsoNested} from './data/isomorphic/iso-nested';
@@ -123,7 +123,7 @@ describe('renderToHtml(isomorphicComponent)', () => {
         test('renders correctly', async () => {
             expect(await renderToHtml(
                 <IsoNestedWithStyles coefficient={9} />,
-                {serverRenderer: StyledComponentsServerRenderer}
+                {render: styledComponentsRenderToHtml}
             ))
                 .toMatchSnapshot();
         });

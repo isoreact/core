@@ -1,5 +1,5 @@
 import React from 'react';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Observable} from 'rxjs';
 import {distinctUntilChanged} from 'rxjs/operators';
 
@@ -8,10 +8,10 @@ import hasValueNow from './has-value-now';
 
 class Connector extends React.Component {
     static propTypes = {
-        component: propTypes.oneOfType([propTypes.instanceOf(React.Component), propTypes.func]).isRequired,
-        data$: propTypes.instanceOf(Observable).isRequired,
-        distinctBy: propTypes.func,
-        loadingProp: propTypes.string.isRequired,
+        component: PropTypes.oneOfType([PropTypes.instanceOf(React.Component), PropTypes.func]).isRequired,
+        data$: PropTypes.instanceOf(Observable).isRequired,
+        distinctBy: PropTypes.func,
+        loadingProp: PropTypes.string.isRequired,
     };
 
     static defaultProps = {
@@ -65,9 +65,9 @@ const Connect = ({
 );
 
 Connect.propTypes = {
-    context: propTypes.object.isRequired,
-    distinctBy: propTypes.func,
-    children: propTypes.oneOfType([propTypes.instanceOf(React.Component), propTypes.func]).isRequired,
+    context: PropTypes.object.isRequired,
+    distinctBy: PropTypes.func,
+    children: PropTypes.oneOfType([PropTypes.instanceOf(React.Component), PropTypes.func]).isRequired,
 };
 
 export default Connect;

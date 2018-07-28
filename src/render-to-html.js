@@ -6,14 +6,10 @@ import cuid from 'cuid';
 
 import {ServerContext} from './context';
 
-class DefaultServerRenderer {
-    headHtml = '';
-    bodyHtml = '';
-
-    render(reactElement) {
-        this.bodyHtml = ReactDOMServer.renderToString(reactElement);
-    }
-}
+const defaultRender = (reactElement) => ({
+    head: '',
+    body: ReactDOMServer.renderToString(reactElement),
+});
 
 /**
  * Asynchronously render a React component to HTML, also rendering a script tag that stores <code>props</code> and
@@ -21,7 +17,7 @@ class DefaultServerRenderer {
  *
  * @param {Object}   isomorphicElement        - an instance of an isomorphic component
  * @param {Object}   [options]                - (see below)
- * @param {Function} [options.serverRenderer] - an optional constructor for an alternative server renderer
+ * @param {Function} [options.render]         - an optional alternative server renderer
  * @param {string}   [options.className]      - an optional class name for the mount point
  * @returns {Promise.<{head: string, body: string}>} a promise that will resolve to the element's body HTML and any
  *                                                   supporting head HTML
@@ -29,7 +25,7 @@ class DefaultServerRenderer {
 export default async function renderToHtml(
     isomorphicElement,
     {
-        serverRenderer: ServerRenderer = DefaultServerRenderer,
+        render = defaultRender,
         className,
     } = {}
 ) {
@@ -37,13 +33,11 @@ export default async function renderToHtml(
 
     // If this isn't an isomorphic component, rather than crapping out, just render it as a plain component.
     if (!isomorphicConfig) {
-        const renderer = new ServerRenderer();
-
-        renderer.render(isomorphicElement);
+        const {head, body} = render(isomorphicElement);
 
         return {
-            head: renderer.headHtml,
-            body: `<div${className ? ` class="${className}"` : ''}>${renderer.bodyHtml}</div>`,
+            head,
+            body: `<div${className ? ` class="${className}"` : ''}>${body}</div>`,
         };
     }
 
@@ -68,45 +62,60 @@ export default async function renderToHtml(
         pendingKeys.delete(key);
     };
 
-    let headHtml;
-    let bodyHtml;
+    let error;
+    const onError = (e) => {
+        console.log('Error caught!', e); // eslint-disable-line
+        error = e;
+    };
 
-    const id = cuid();
+    // Start walking the element tree.
+    ReactDOMServer.renderToStaticMarkup((
+        <ServerContext.Provider value={{getStream, registerStream, onError}}>
+            {isomorphicElement}
+        </ServerContext.Provider>
+    ));
 
     // Keep trying to synchronously render the component to HTML, retrying until nothing is waiting on pending streams.
     do {
-        // Wait for any and all pending keys' streams to resolve.
-        if (pendingKeys.size) {
-            await Promise.all(
-                [...pendingKeys].map(async (key) => {
-                    hydration[key] = await registeredStreams[key]
+        // Get all the currently pending keys
+        const keys = [...pendingKeys];
+
+        // Wait for all of them to resolve.
+        await Promise.all(
+            keys
+                .map((key) => (
+                    registeredStreams[key]
                         .pipe(
                             map(({hydration}) => hydration),
-                            first(),
+                            first()
                         )
-                        .toPromise();
-                    pendingKeys.delete(key);
-                })
-            );
+                        .toPromise()
+                ))
+        );
+
+        // Remove them from pendingKeys, which may have had more keys added while waiting.
+        keys.forEach((key) => pendingKeys.delete(key));
+
+        // Rethrow any error from the element tree
+        if (error) {
+            throw error;
         }
-
-        const renderer = new ServerRenderer();
-
-        // Render the component to HTML
-        renderer.render((
-            <ServerContext.Provider value={{getStream, registerStream}}>
-                {isomorphicElement}
-            </ServerContext.Provider>
-        ), id);
-
-        ({headHtml, bodyHtml} = renderer);
     } while (pendingKeys.size);
+
+    // Now that everything is resolved, synchronously render the html.
+    const {head, body} = render((
+        <ServerContext.Provider value={{getStream}}>
+            {isomorphicElement}
+        </ServerContext.Provider>
+    ));
+
+    const id = cuid();
 
     // Return the component HTML and some JavaScript to store props and initial data.
     return {
-        head: headHtml,
+        head,
         body: [
-            `<div id="${id}"${className ? ` class="${className}"` : ''}>${bodyHtml}</div>`,
+            `<div id="${id}"${className ? ` class="${className}"` : ''}>${body}</div>`,
             '<script type="text/javascript">',
             `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
             '</script>',
