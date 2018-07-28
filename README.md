@@ -14,10 +14,6 @@ Features:
 This is a library, not a framework. It is focused on state management and
 isomorphism and should otherwise stay out of your way.
 
-## Status
-
-**This is an early work in progress. It is not yet suitable for production!**
-
 ## Installation
 
 ```
