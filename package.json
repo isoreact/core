@@ -1,6 +1,6 @@
 {
   "name": "@isoreact/core",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A library for making isomorphic React components with RxJS",
   "author": "Steve Taylor",
   "license": "MIT",
