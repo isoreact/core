@@ -7,7 +7,7 @@ import SimpleContext from '../context/simple-context';
 const Simple = () => (
     <section>
         <Connect context={SimpleContext}>
-            {({x}) => x}
+            {({x}) => x || null}
         </Connect>
     </section>
 );

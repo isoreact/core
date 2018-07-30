@@ -155,7 +155,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
     describe('observable does not immediately produce an event', () => {
         let originalConsoleError;
         let consoleErrorSpy;
-        const html = '<div id="0123456789abcdef"><section>625</section></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":null});</script>';
+        const html = '<div id="0123456789abcdef"></div><script type="text/javascript">Object.assign(["__ISO_DATA__","iso-simple","0123456789abcdef"].reduce(function(a,b){return a[b]=a[b]||{};},window),{"props":{"power":4},"hydration":{}});</script>';
 
         beforeEach(() => {
             originalConsoleError = console.error;

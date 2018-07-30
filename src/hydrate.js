@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import {HydrationContext} from './context';
-import hasValueNow from './has-value-now';
 import keyFor from './key-for';
 
 /**
@@ -99,26 +98,21 @@ function hydrateElement(
         hydration,
     }
 ) {
-    const {name, getData} = IsomorphicComponent.__isomorphic_config__;
+    const {name} = IsomorphicComponent.__isomorphic_config__;
 
     if (process.env.NODE_ENV === 'development') {
         console.info(`Hydrating component "${name}"...`); // eslint-disable-line no-console
     }
 
-    // Ensure hydration (or rendering) happens immediately.
-    if (!hasValueNow(getData(props, hydration))) {
-        console.error(
-            `Cannot hydrate isomorphic component "${name}" at DOM node "#${element.id}" because the Observable`
-            + ' returned by its getData() function does not produce its first event to subscribers immediately.'
-        );
-
-        return;
-    }
-
     if (hydration) {
         // If we have initial data, hydrate the server-rendered component
         ReactDOM.hydrate((
-            <HydrationContext.Provider value={(name, props) => hydration[keyFor(name, props)]}>
+            <HydrationContext.Provider
+                value={(name, props) => ({
+                    hydration: hydration[keyFor(name, props)],
+                    elementId: element.id,
+                })}
+            >
                 <IsomorphicComponent {...props} />
             </HydrationContext.Provider>
         ), element);

@@ -11,12 +11,7 @@ const isoThrowsError = {
     name: 'iso-throws-error',
     component: ThrowsError,
     context: ThrowsErrorContext,
-    getData: () => {
-        return Observable.create((observer) => {
-            observer.error('Goodnight');
-        });
-    },
-    loadingProp: 'isLoading',
+    getData: () => Observable.create((observer) => void observer.error('Goodnight')),
     propTypes: {
         power: PropTypes.number,
     },

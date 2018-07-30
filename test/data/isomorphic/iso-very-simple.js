@@ -15,12 +15,11 @@ const isoVerySimple = {
         const {power = 1} = props;
 
         return observableOf({
-            props: {
+            state: {
                 x: 5 ** power,
             },
         });
     },
-    loadingProp: 'isLoading',
     propTypes: {
         power: PropTypes.number,
     },

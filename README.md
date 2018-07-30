@@ -72,16 +72,8 @@ const ProfileLoading = () => (
 
 const Profile = () => (
     <section className="profile">
-        <Connect context={profileContext}>
-            {({isLoading}) => isLoading ? (
-                <ProfileLoading />
-            ) : (
-                <React.Fragment>
-                    <ProfileName />
-                    <ProfilePhoto />
-                </React.Fragment>
-            )}
-        </Connect>
+        <ProfileName />
+        <ProfilePhoto />
     </section>
 );
 
@@ -96,7 +88,7 @@ Define your component's event stream and make it isomorphic:
 // iso-profile.js
 import PropType from 'prop-types';
 import {of as observableOf, combineLatest} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {isomorphic} from '@isoreact/core';
 import Profile from './profile';
 import profileContext from './profile-context';
@@ -107,7 +99,6 @@ const IsoProfile = isomorphic({
     name: 'iso-profile',
     component: Profile,
     context: profileContext,
-    loadingProp: 'isLoading',
     getData: (props, hydration) => {
         const {userId} = props;
         
@@ -122,8 +113,8 @@ const IsoProfile = isomorphic({
         return combineLatest(name$, photo$)
             .pipe(
                 map(([name, photo]) => ({
-                    // React component rendered with these props
-                    props: {
+                    // React component rendered with this state as its props
+                    state: {
                         name,
                         photo,
                     },
@@ -134,7 +125,6 @@ const IsoProfile = isomorphic({
                         photo,
                     },
                 })),
-                shareReplay(1),
             );
     },
     propTypes: {
@@ -147,8 +137,8 @@ export default IsoProfile;
 
 The general contract of `getData(props, hydration)` is:
 
-* Return a hot `Observable` that emits its last value, if any, immediately upon subscription. (Use `shareReplay(1)`.)
-* The observable must emit objects of the form `{props, hydration}` where both `props` and `hydration` are objects.
+* Return an observable that emits objects of the form `{state, hydration}` where both `state` and `hydration` are
+  objects.
 * If `getData` is provided a `hydration` object, the observable is expected to immediately produce an event.
 * Events must contain `hydration` only when the `hydration` parameter is not present (i.e. on the server).
 * Events can contain `hydration` when the `hydration` parameter is present, but it will have no effect.
@@ -175,9 +165,9 @@ async function renderUserProfilesPage(userIds) {
 
 When `renderToHtml` is called, it will call each isomorphic components' `getData` function, passing in the isomorphic
 component's props (in this case, `userId`). When the stream returned by `getData` produces its first event (an object
-consisting of `props` to inject into the React component and `hydration` to attach to the HTML page), the isomorphic
-component's React component will be rendered with those `props` and the `hydration` data will be rendered adjacent to
-it in the HTML page.
+consisting of `state` to inject into the React component and `hydration` to attach to the HTML page), the isomorphic
+component's React component will be rendered with the `state` as its `props` and the `hydration` data will be rendered
+adjacent to it in the HTML page.
 
 Somewhere on the client:
 

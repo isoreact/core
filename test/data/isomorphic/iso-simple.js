@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import {combineLatest, of as observableOf} from 'rxjs';
-import {map, shareReplay} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 import hydrate from '../../../src/hydrate';
 import isomorphic from '../../../src/isomorphic';
@@ -33,14 +33,12 @@ const isoSimple = {
             }))),
         )
             .pipe(
-                map(([props, hydration]) => ({
-                    props,
+                map(([state, hydration]) => ({
+                    state,
                     hydration,
                 })),
-                shareReplay(1),
             );
     },
-    loadingProp: 'isLoading',
     propTypes: {
         power: PropTypes.number,
     },

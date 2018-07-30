@@ -4,14 +4,12 @@ import {Observable} from 'rxjs';
 import {distinctUntilChanged} from 'rxjs/operators';
 
 import getValueNow from './get-value-now';
-import hasValueNow from './has-value-now';
 
 class Connector extends React.Component {
     static propTypes = {
         component: PropTypes.oneOfType([PropTypes.instanceOf(React.Component), PropTypes.func]).isRequired,
         data$: PropTypes.instanceOf(Observable).isRequired,
         distinctBy: PropTypes.func,
-        loadingProp: PropTypes.string.isRequired,
     };
 
     static defaultProps = {
@@ -19,8 +17,7 @@ class Connector extends React.Component {
     };
 
     state = {
-        [this.props.loadingProp]: !hasValueNow(this.props.data$),
-        ...(hasValueNow(this.props.data$) ? getValueNow(this.props.data$) : {}),
+        ...getValueNow(this.props.data$),
     };
 
     componentDidMount() {
@@ -29,10 +26,7 @@ class Connector extends React.Component {
                 distinctUntilChanged((a, b) => this.props.distinctBy(a) === this.props.distinctBy(b))
             )
             .subscribe((data) => {
-                this.setState(() => ({
-                    [this.props.loadingProp]: false,
-                    ...data,
-                }));
+                this.setState(() => data);
             });
     }
 
@@ -53,12 +47,11 @@ const Connect = ({
     children,
 }) => (
     <Context.Consumer>
-        {({data$, loadingProp}) => (
+        {({data$}) => (
             <Connector
                 component={children}
                 data$={data$}
                 distinctBy={distinctBy}
-                loadingProp={loadingProp}
             />
         )}
     </Context.Consumer>

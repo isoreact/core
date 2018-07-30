@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import {first, map, shareReplay} from 'rxjs/operators';
+import {of as observableOf} from 'rxjs';
+import {first, map, publishReplay, refCount} from 'rxjs/operators';
 
 import {ServerContext, HydrationContext} from './context';
 import hasValueNow from './has-value-now';
@@ -22,7 +23,6 @@ import keyFor from './key-for';
  * @param {Function}      isomorphicComponent.component   - React component
  * @param {React.Context} isomorphicComponent.context     - context to provide and consume the data stream
  * @param {getData}       isomorphicComponent.getData     - data stream creation function
- * @param {String}        isomorphicComponent.loadingProp - the name of the flag to toggle when loading/completed
  * @param {Object}        isomorphicComponent.propTypes   - propType validations
  * @returns {Function} the created isomorphic component
  */
@@ -31,7 +31,6 @@ export default function isomorphic({
     component:   Component,
     context:     Context,
     getData,
-    loadingProp,
     propTypes, // eslint-disable-line react/forbid-foreign-prop-types
 }) {
     return class Isomorphic extends React.Component {
@@ -40,7 +39,6 @@ export default function isomorphic({
             component: Component,
             context: Context,
             getData,
-            loadingProp,
             propTypes,
         };
 
@@ -58,16 +56,40 @@ export default function isomorphic({
             if (process.browser) {
                 return (
                     <HydrationContext.Consumer>
-                        {(getHydration) => (
-                            <Context.Provider
-                                value={{
-                                    data$: getData(props, getHydration(name, props)).pipe(map(({props}) => props)),
-                                    loadingProp,
-                                }}
-                            >
-                                <Component />
-                            </Context.Provider>
-                        )}
+                        {(getHydration) => {
+                            const {hydration, elementId} = getHydration(name, props) || {};
+                            const data$ = getData(props, hydration)
+                                .pipe(
+                                    map(({state}) => state),
+                                    publishReplay(1),
+                                    refCount(),
+                                );
+
+                            // Ensure hydration or rendering happens immediately.
+                            if (!hasValueNow(data$)) {
+                                if (elementId) {
+                                    console.error(
+                                        `Cannot hydrate isomorphic component "${name}" at DOM node "#${elementId}"`
+                                        + ' because the Observable returned by its getData() function does not produce'
+                                        + ' its first event to subscribers immediately.'
+                                    );
+                                } else {
+                                    console.error(
+                                        `Cannot render isomorphic component "${name}" because the Observable returned`
+                                        + ' by its getData() function does not produce its first event to subscribers'
+                                        + ' immediately.'
+                                    );
+                                }
+
+                                return null;
+                            }
+
+                            return (
+                                <Context.Provider value={{data$}}>
+                                    <Component />
+                                </Context.Provider>
+                            );
+                        }}
                     </HydrationContext.Consumer>
                 );
             } else {
@@ -78,7 +100,12 @@ export default function isomorphic({
                             let stream$ = getStream(key);
 
                             if (!stream$) {
-                                stream$ = getData(props, undefined);
+                                stream$ = getData(props, undefined)
+                                    .pipe(
+                                        first(),
+                                        publishReplay(1),
+                                        refCount(),
+                                    );
                                 registerStream(key, stream$);
                             }
 
@@ -87,8 +114,7 @@ export default function isomorphic({
                                 return (
                                     <Context.Provider
                                         value={{
-                                            data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
-                                            loadingProp,
+                                            data$: stream$.pipe(map(({state}) => state)),
                                         }}
                                     >
                                         <Component />
@@ -98,15 +124,13 @@ export default function isomorphic({
 
                             // When the stream resolves later, continue walking the tree.
                             stream$
-                                .pipe(first())
                                 .toPromise()
-                                .then(() => {
+                                .then((value) => {
                                     ReactDOMServer.renderToStaticMarkup(
                                         <ServerContext.Provider value={{getStream, registerStream}}>
                                             <Context.Provider
                                                 value={{
-                                                    data$: stream$.pipe(map(({props}) => props), shareReplay(1)),
-                                                    loadingProp,
+                                                    data$: observableOf(value).pipe(map(({state}) => state)),
                                                 }}
                                             >
                                                 <Component />

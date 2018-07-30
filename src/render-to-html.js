@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 
-import {first, map} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 import cuid from 'cuid';
 
 import {ServerContext} from './context';
@@ -42,15 +42,6 @@ export default async function renderToHtml(
     const registerStream = async (key, stream$) => {
         registeredStreams[key] = stream$;
         pendingKeys.add(key);
-
-        hydration[key] = await stream$
-            .pipe(
-                map(({hydration}) => hydration),
-                first(),
-            )
-            .toPromise();
-
-        pendingKeys.delete(key);
     };
 
     let error;
@@ -76,8 +67,10 @@ export default async function renderToHtml(
                 .map((key) => (
                     registeredStreams[key]
                         .pipe(
-                            map(({hydration}) => hydration),
-                            first()
+                            tap(({hydration: h}) => {
+                                hydration[key] = h;
+                                pendingKeys.delete(key);
+                            }),
                         )
                         .toPromise()
                 ))
