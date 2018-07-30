@@ -64,12 +64,6 @@ const ProfilePhoto = () => (
     </section>
 );
 
-const ProfileLoading = () => (
-    <div>
-        { /* Use your imagination */ }
-    </div>
-);
-
 const Profile = () => (
     <section className="profile">
         <ProfileName />
