@@ -17,7 +17,7 @@ class Connector extends React.Component {
     };
 
     state = {
-        ...getValueNow(this.props.data$),
+        value: getValueNow(this.props.data$),
     };
 
     componentDidMount() {
@@ -25,8 +25,8 @@ class Connector extends React.Component {
             .pipe(
                 distinctUntilChanged((a, b) => this.props.distinctBy(a) === this.props.distinctBy(b))
             )
-            .subscribe((data) => {
-                this.setState(() => data);
+            .subscribe((value) => {
+                this.setState(() => ({value}));
             });
     }
 
@@ -36,7 +36,7 @@ class Connector extends React.Component {
 
     render() {
         return (
-            <this.props.component {...this.state} />
+            <this.props.component {...this.state.value} />
         );
     }
 }
