@@ -83,6 +83,7 @@ export default [
             // Node modules
             'crypto',
             'os',
+            'util',
         ],
     })),
 ], []);

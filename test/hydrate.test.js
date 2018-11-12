@@ -175,11 +175,7 @@ describe('hydrate(isomorphicComponent, options)', () => {
         });
 
         test('it complains that subscribers have to wait for the observable before rendering', () => {
-            expect(consoleErrorSpy.mock.calls).toHaveLength(1);
-        });
-
-        test('it complains with the expected message', () => {
-            expect(consoleErrorSpy.mock.calls[0][0]).toBe('Cannot hydrate isomorphic component "iso-simple" at DOM node "#0123456789abcdef" because the Observable returned by its getData() function does not produce its first event to subscribers immediately.');
+            expect(consoleErrorSpy.mock.calls.slice(-1)[0][0]).toBe('Cannot hydrate isomorphic component "iso-simple" at DOM node "#0123456789abcdef" because the Observable returned by its getData() function does not produce its first event to subscribers immediately.');
         });
     });
 

@@ -1,43 +1,93 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import {Observable} from 'rxjs';
 import {distinctUntilChanged} from 'rxjs/operators';
 
-import getValueNow from './get-value-now';
-
 class Connector extends React.Component {
     static propTypes = {
-        component: PropTypes.oneOfType([PropTypes.instanceOf(React.Component), PropTypes.func]).isRequired,
-        data$: PropTypes.instanceOf(Observable).isRequired,
-        distinctBy: PropTypes.func,
+        component: propTypes.oneOfType([propTypes.instanceOf(React.Component), propTypes.func]).isRequired,
+        data$: propTypes.instanceOf(Observable).isRequired,
+        distinctBy: propTypes.func,
+        name: propTypes.string,
+        elementId: propTypes.string,
     };
 
     static defaultProps = {
         distinctBy: (value) => value,
     };
 
-    state = {
-        value: getValueNow(this.props.data$),
-    };
+    constructor(props) {
+        super(props);
 
-    componentDidMount() {
-        this.subscription = this.props.data$
+        this.observer = (value) => {
+            this.state = {value};
+        };
+
+        this.subscription = props
+            .data$
             .pipe(
-                distinctUntilChanged((a, b) => this.props.distinctBy(a) === this.props.distinctBy(b))
+                distinctUntilChanged((a, b) => props.distinctBy(a) === props.distinctBy(b))
             )
             .subscribe((value) => {
-                this.setState(() => ({value}));
+                this.observer(value);
             });
+
+        // The stream must produce an event immediately on subscription so we can render something.
+        if (!this.state) {
+            this.subscription.unsubscribe();
+            this.subscription = undefined;
+
+            const {name, elementId} = props;
+
+            if (elementId) {
+                console.error(
+                    `Cannot hydrate isomorphic component "${name}" at DOM node "#${elementId}"`
+                    + ' because the Observable returned by its getData() function does not produce'
+                    + ' its first event to subscribers immediately.'
+                );
+            } else {
+                console.error(
+                    `Cannot render isomorphic component "${name}" because the Observable returned`
+                    + ' by its getData() function does not produce its first event to subscribers'
+                    + ' immediately.'
+                );
+            }
+        }
+
+        this.observer = () => {};
+    }
+
+    componentDidMount() {
+        if (this.state) {
+            this.observer = (value) => {
+                this.setState({value});
+            };
+
+            if (!this.subscription) {
+                this.subscription = this
+                    .props
+                    .data$
+                    .pipe(
+                        distinctUntilChanged((a, b) => this.props.distinctBy(a) === this.props.distinctBy(b))
+                    )
+                    .subscribe((value) => {
+                        this.observer(value);
+                    });
+            }
+        }
     }
 
     componentWillUnmount() {
-        this.subscription.unsubscribe();
+        if (this.subscription) {
+            this.subscription.unsubscribe();
+            this.subscription = undefined;
+        }
     }
 
     render() {
-        return (
-            <this.props.component {...this.state.value} />
-        );
+        return this.state
+            ? <this.props.component {...this.state.value} />
+            : null;
     }
 }
 
@@ -47,20 +97,19 @@ const Connect = ({
     children,
 }) => (
     <Context.Consumer>
-        {({data$}) => (
+        {({data$, name, elementId}) => (
             <Connector
                 component={children}
-                data$={data$}
-                distinctBy={distinctBy}
+                {...{data$, distinctBy, name, elementId}}
             />
         )}
     </Context.Consumer>
 );
 
 Connect.propTypes = {
-    context: PropTypes.object.isRequired,
-    distinctBy: PropTypes.func,
-    children: PropTypes.oneOfType([PropTypes.instanceOf(React.Component), PropTypes.func]).isRequired,
+    context: propTypes.object.isRequired,
+    distinctBy: propTypes.func,
+    children: propTypes.oneOfType([propTypes.instanceOf(React.Component), propTypes.func]).isRequired,
 };
 
 export default Connect;

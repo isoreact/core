@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import {combineLatest, of as observableOf} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -48,7 +48,7 @@ const isoNestedWithStyles = {
             );
     },
     propTypes: {
-        coefficient: PropTypes.number,
+        coefficient: propTypes.number,
     },
 };
 

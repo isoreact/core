@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import {of as observableOf} from 'rxjs';
 
 import hydrate from '../../../src/hydrate';
@@ -21,7 +21,7 @@ const isoVerySimple = {
         });
     },
     propTypes: {
-        power: PropTypes.number,
+        power: propTypes.number,
     },
 };
 
