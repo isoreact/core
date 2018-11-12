@@ -65,27 +65,8 @@ export default function isomorphic({
                                     refCount(),
                                 );
 
-                            // Ensure hydration or rendering happens immediately.
-                            if (!hasValueNow(data$)) {
-                                if (elementId) {
-                                    console.error(
-                                        `Cannot hydrate isomorphic component "${name}" at DOM node "#${elementId}"`
-                                        + ' because the Observable returned by its getData() function does not produce'
-                                        + ' its first event to subscribers immediately.'
-                                    );
-                                } else {
-                                    console.error(
-                                        `Cannot render isomorphic component "${name}" because the Observable returned`
-                                        + ' by its getData() function does not produce its first event to subscribers'
-                                        + ' immediately.'
-                                    );
-                                }
-
-                                return null;
-                            }
-
                             return (
-                                <Context.Provider value={{data$}}>
+                                <Context.Provider value={{data$, name, elementId}}>
                                     <Component />
                                 </Context.Provider>
                             );
@@ -131,6 +112,7 @@ export default function isomorphic({
                                             <Context.Provider
                                                 value={{
                                                     data$: observableOf(value).pipe(map(({state}) => state)),
+                                                    name,
                                                 }}
                                             >
                                                 <Component />

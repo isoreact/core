@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import {Observable} from 'rxjs';
 
 import hydrate from '../../../src/hydrate';
@@ -13,7 +13,7 @@ const isoThrowsError = {
     context: ThrowsErrorContext,
     getData: () => Observable.create((observer) => void observer.error('Goodnight')),
     propTypes: {
-        power: PropTypes.number,
+        power: propTypes.number,
     },
 };
 

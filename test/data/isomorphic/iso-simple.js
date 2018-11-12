@@ -1,4 +1,4 @@
-import PropTypes from 'prop-types';
+import propTypes from 'prop-types';
 import {combineLatest, of as observableOf} from 'rxjs';
 import {map} from 'rxjs/operators';
 
@@ -40,7 +40,7 @@ const isoSimple = {
             );
     },
     propTypes: {
-        power: PropTypes.number,
+        power: propTypes.number,
     },
 };
 
