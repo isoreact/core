@@ -1,25 +1,25 @@
 {
     "presets": [
-        "env",
-        "react"
+        [
+            "@babel/preset-env",
+            {
+                "targets": {
+                    "node": "current"
+                }
+            }
+        ],
+        "@babel/preset-react"
     ],
     "plugins": [
-        "transform-class-properties",
-        "transform-object-rest-spread",
+        "@babel/plugin-proposal-class-properties",
+        "@babel/plugin-proposal-object-rest-spread",
         [
-            "styled-components",
+            "babel-plugin-styled-components",
             {
                 "ssr": true,
                 "displayName": true,
                 "fileName": false
             }
         ]
-    ],
-    "env": {
-        "production": {
-            "presets": [
-                "minify"
-            ]
-        }
-    }
+    ]
 }

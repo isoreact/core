@@ -7,4 +7,9 @@ module.exports = {
         "no-invalid-this": 0,                          // it doesn't understand class properties
         "no-empty-function": 0,                        // not installing lodash just for noop
     },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    }
 };

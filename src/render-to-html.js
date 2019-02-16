@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-
 import {tap} from 'rxjs/operators';
 import cuid from 'cuid';
+import serialize from 'serialize-javascript';
 
 import {ServerContext} from './context';
 
@@ -98,7 +98,7 @@ export default async function renderToHtml(
     return [
         `<div id="${id}"${className ? ` class="${className}"` : ''}>${html}</div>`,
         '<script type="text/javascript">',
-        `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${JSON.stringify({props: isomorphicElement.props, hydration})});`,
+        `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${serialize({props: isomorphicElement.props, hydration}, {isJSON: true})});`,
         '</script>',
     ].join('');
 }

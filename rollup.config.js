@@ -3,6 +3,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import replace from 'rollup-plugin-replace';
 import sourceMaps from 'rollup-plugin-sourcemaps';
+import {terser} from 'rollup-plugin-terser';
 
 import pkg from './package.json';
 
@@ -29,8 +30,11 @@ export default [
                 'dist/isoreact-core',
                 target,
                 format,
+                environment === 'production' && 'min',
                 'js',
-            ].join('.'),
+            ]
+                .filter(Boolean)
+                .join('.'),
         },
         plugins: [
             sourceMaps(),
@@ -42,27 +46,29 @@ export default [
                 babelrc: false,
                 presets: [
                     [
-                        'env',
+                        '@babel/preset-env',
                         {
                             modules: false,
                             targets: target === 'server ' ? {node: '10.0'} : {browsers: ['last 2 versions']},
                         },
                     ],
-                    'react',
-                ],
+                    '@babel/preset-react',
+                ]
+                    .filter(Boolean),
                 plugins: [
-                    'transform-object-rest-spread',
-                    'transform-class-properties',
-                    'external-helpers',
+                    '@babel/plugin-proposal-object-rest-spread',
+                    '@babel/plugin-proposal-class-properties',
                     [
-                        'styled-components',
+                        'babel-plugin-styled-components',
                         {
                             ssr: true,
                             displayName: true,
                             fileName: false,
                         },
                     ],
-                ].filter(Boolean),
+                    environment === 'production' && 'babel-plugin-transform-react-remove-prop-types',
+                ]
+                    .filter(Boolean),
                 exclude: 'node_modules/**',
             }),
             commonjs(),
@@ -71,7 +77,9 @@ export default [
                 'process.server': (target === 'server').toString(),
                 'process.env.NODE_ENV': `"${environment}"`,
             }),
-        ],
+            environment === 'production' && terser(),
+        ]
+            .filter(Boolean),
         external: [
             // Top-level peerDependencies modules
             ...Object.keys(pkg.peerDependencies),
