@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Connect from '../../../src/connect';
+import Connect from '../../../../src/connect';
 
-import VerySimpleContext from '../context/very-simple-context';
+import VerySimpleContext from '../../context/very-simple-context';
 
 const VerySimple = () => (
     <section>

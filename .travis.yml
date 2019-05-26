@@ -8,7 +8,7 @@ script: "npm run ci-cd"
 deploy:
   skip_cleanup: true
   provider: npm
-  email: mail@steve-taylor.org
+  email: mail@stevetaylor.io
   api_key:
     secure: Uz9RlIR2yPuFDC9ARGmFjE6clBuiHKz/WoASIxIKDhXcD9dlqbVt+Na5DmHlHSDn8SPcfW4wRl9DqNPVTO4Xxd79p6ebZ96bXqAPOd1E8OUIKUk6wwV/ol9Axn1AEJr0ZK548uSiYn651HX0gGSw71CQ5xPtI9stGKUi86W7/81gy8EFvyH8AUzrEF6cW67LLGFZb0XkvEuNHNjlM+4k/mi/twpFMFOtf31gtnsBj8FfwKD8xEFlBXq9sFtp+UO8MaCyR5ajsQPpRJcnHRXfAXPx30+5YgmR1zu04iKP4STH+7QAFtjvb1NCU6Bc1YBvPY/AgtvKX078ad0gme2Ea0CRZNXAw/Oyymcnw90y9ZvGPF17iFF+/9RG+FR9mNtjJmLBQGWGje4bXIj+JjHnsO0OXpGh6rwMUuSzdlNy25vDb/nAtNH6hZ7SY0mtADvV+ZGHrrFUTXlBiS98itfzgjXMVLA+I6id1IygRypwNeHk/4OzJysd52UaCLLMmxVyQ2WNbiVkjFKa6dtxsLjfjYCu6Mk8huEAieZUh3MFlefUNSumbxFqTcHFyg7V9nVkQAfKoyZbxafyvUTFJ3yneBZMjMipDeih+mcVWpH0JwBOyKl56ikGDve/MgSIbxTleuF7lGupynKzdkGshGYojWBKCHPnBPgx4S62/Gg9Tos=
   on:

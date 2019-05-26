@@ -26,7 +26,7 @@ export default function hydrate(
         return;
     }
 
-    if (!IsomorphicComponent.__isomorphic_config__) {
+    if (!IsomorphicComponent.__isomorphic_name__) {
         console.error('Cannot hydrate a non-isomorphic component');
 
         return;
@@ -42,7 +42,7 @@ export default function hydrate(
         return;
     }
 
-    const {name} = IsomorphicComponent.__isomorphic_config__;
+    const {__isomorphic_name__: name} = IsomorphicComponent;
     const componentHydrations = isoData[name];
 
     if (!componentHydrations) {
@@ -98,7 +98,7 @@ function hydrateElement(
         hydration,
     }
 ) {
-    const {name} = IsomorphicComponent.__isomorphic_config__;
+    const {__isomorphic_name__: name} = IsomorphicComponent;
 
     if (process.env.NODE_ENV === 'development') {
         console.info(`Hydrating component "${name}"...`); // eslint-disable-line no-console

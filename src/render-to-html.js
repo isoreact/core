@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import {tap} from 'rxjs/operators';
+import bacon from 'baconjs';
 import cuid from 'cuid';
 import serialize from 'serialize-javascript';
 
@@ -25,10 +25,10 @@ export default async function renderToHtml(
         className,
     } = {}
 ) {
-    const {__isomorphic_config__: isomorphicConfig} = isomorphicElement.type;
+    const {__isomorphic_name__: name} = isomorphicElement.type;
 
     // If this isn't an isomorphic component, rather than crapping out, just render it as a plain component.
-    if (!isomorphicConfig) {
+    if (!name) {
         return `<div${className ? ` class="${className}"` : ''}>${render(isomorphicElement)}</div>`;
     }
 
@@ -39,7 +39,7 @@ export default async function renderToHtml(
     const getStream = (key) => registeredStreams[key];
 
     // Register stream. In the background, this stores the initial event in hydration, then deregisters the stream.
-    const registerStream = async (key, stream$) => {
+    const registerStream = (key, stream$) => {
         registeredStreams[key] = stream$;
         pendingKeys.add(key);
     };
@@ -56,25 +56,29 @@ export default async function renderToHtml(
         </ServerContext.Provider>
     ));
 
+    // Rethrow immediately produced error
+    if (error) {
+        throw error;
+    }
+
     // Keep trying to synchronously render the component to HTML, retrying until nothing is waiting on pending streams.
     do {
         // Get all the currently pending keys
         const keys = [...pendingKeys];
 
         // Wait for all of them to resolve.
-        await Promise.all(
-            keys
-                .map((key) => (
+        await bacon
+            .combineAsArray(
+                keys.map((key) => (
                     registeredStreams[key]
-                        .pipe(
-                            tap(({hydration: h}) => {
-                                hydration[key] = h;
-                                pendingKeys.delete(key);
-                            }),
-                        )
-                        .toPromise()
+                        .first()
+                        .doAction(({hydration: h}) => {
+                            hydration[key] = h;
+                            pendingKeys.delete(key);
+                        })
                 ))
-        );
+            )
+            .firstToPromise();
 
         // Remove them from pendingKeys, which may have had more keys added while waiting.
         keys.forEach((key) => pendingKeys.delete(key));
@@ -98,7 +102,7 @@ export default async function renderToHtml(
     return [
         `<div id="${id}"${className ? ` class="${className}"` : ''}>${html}</div>`,
         '<script type="text/javascript">',
-        `Object.assign(["__ISO_DATA__","${isomorphicConfig.name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${serialize({props: isomorphicElement.props, hydration}, {isJSON: true})});`,
+        `Object.assign(["__ISO_DATA__","${name}","${id}"].reduce(function(a,b){return a[b]=a[b]||{};},window),${serialize({props: isomorphicElement.props, hydration}, {isJSON: true})});`,
         '</script>',
     ].join('');
 }

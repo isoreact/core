@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import {of as observableOf} from 'rxjs';
-import {first, map, publishReplay, refCount} from 'rxjs/operators';
+import bacon from 'baconjs';
 
 import {ServerContext, HydrationContext} from './context';
-import hasValueNow from './has-value-now';
+import {SSR_TIMEOUT_ERROR} from './errors';
 import keyFor from './key-for';
 
 /**
- * A function to create an RxJS <code>Observable</code>, optionally taking initial data when hydrating in the browser.
+ * A function to create a Bacon.js <code>Observable</code>, optionally taking initial data when hydrating in the browser.
  *
  * @callback getData
  * @param {Object} props       - props passed to the isomorphic component, some of which it may use to look up data
@@ -18,12 +17,13 @@ import keyFor from './key-for';
 /**
  * Create an isomorphic version of a React component.
  *
- * @param {Object}        isomorphicComponent             - isomorphic component details
- * @param {String}        isomorphicComponent.name        - name
- * @param {Function}      isomorphicComponent.component   - React component
- * @param {React.Context} isomorphicComponent.context     - context to provide and consume the data stream
- * @param {getData}       isomorphicComponent.getData     - data stream creation function
- * @param {Object}        isomorphicComponent.propTypes   - propType validations
+ * @param {Object}        isomorphicComponent               - isomorphic component details
+ * @param {String}        isomorphicComponent.name          - name
+ * @param {Function}      isomorphicComponent.component     - React component
+ * @param {React.Context} isomorphicComponent.context       - context to provide and consume the data stream
+ * @param {getData}       isomorphicComponent.getData       - data stream creation function
+ * @param {timeout}       [isomorphicComponent.timeout]     - the number of milliseconds to wait for the stream to emit its first value
+ * @param {Object}        [isomorphicComponent.propTypes]   - propType validations
  * @returns {Function} the created isomorphic component
  */
 export default function isomorphic({
@@ -31,19 +31,12 @@ export default function isomorphic({
     component:   Component,
     context:     Context,
     getData,
+    timeout,
     propTypes, // eslint-disable-line react/forbid-foreign-prop-types
 }) {
     return class Isomorphic extends React.Component {
-        static __isomorphic_config__ = { // eslint-disable-line camelcase
-            name,
-            component: Component,
-            context: Context,
-            getData,
-            propTypes,
-        };
-
+        static __isomorphic_name__ = name; // eslint-disable-line camelcase
         static displayName = name;
-
         static propTypes = propTypes;
 
         shouldComponentUpdate() {
@@ -58,12 +51,7 @@ export default function isomorphic({
                     <HydrationContext.Consumer>
                         {(getHydration) => {
                             const {hydration, elementId} = getHydration(name, props) || {};
-                            const data$ = getData(props, hydration)
-                                .pipe(
-                                    map(({state}) => state),
-                                    publishReplay(1),
-                                    refCount(),
-                                );
+                            const data$ = getData(props, hydration).map('.state');
 
                             return (
                                 <Context.Provider value={{data$, name, elementId}}>
@@ -81,48 +69,71 @@ export default function isomorphic({
                             let stream$ = getStream(key);
 
                             if (!stream$) {
-                                stream$ = getData(props, undefined)
-                                    .pipe(
-                                        first(),
-                                        publishReplay(1),
-                                        refCount(),
-                                    );
+                                stream$ = getData(props, undefined).first();
                                 registerStream(key, stream$);
                             }
 
+                            let immediate = true;
+                            let immediateValue = null;
+                            let hasImmediateValue = false;
+
+                            bacon
+                                .mergeAll(
+                                    stream$
+                                        .first()
+                                        .doAction(({state}) => {
+                                            if (immediate) {
+                                                hasImmediateValue = true;
+                                                immediateValue = state;
+                                            }
+                                        })
+                                        .doError((error) => {
+                                            if (immediate) {
+                                                onError(error);
+                                            }
+                                        }),
+                                    // Insert an error into the stream after the timeout, if specified, has elapsed.
+                                    timeout === undefined
+                                        ? bacon.never()
+                                        : bacon.later(timeout).flatMapLatest(() => new bacon.Error(SSR_TIMEOUT_ERROR))
+                                )
+                                .firstToPromise()
+                                .then(() => {
+                                    if (!hasImmediateValue) {
+                                        // When the stream resolves later, continue walking the tree.
+                                        ReactDOMServer.renderToStaticMarkup(
+                                            <ServerContext.Provider value={{getStream, registerStream}}>
+                                                <Context.Provider
+                                                    value={{
+                                                        data$: stream$.map('.state'),
+                                                        name,
+                                                    }}
+                                                >
+                                                    <Component />
+                                                </Context.Provider>
+                                            </ServerContext.Provider>
+                                        );
+                                    }
+                                })
+                                .catch((error) => {
+                                    onError(error);
+                                });
+
+                            immediate = false;
+
                             // If the stream is resolved, render it.
-                            if (hasValueNow(stream$)) {
+                            if (hasImmediateValue) {
                                 return (
                                     <Context.Provider
                                         value={{
-                                            data$: stream$.pipe(map(({state}) => state)),
+                                            data$: bacon.constant(immediateValue),
+                                            name,
                                         }}
                                     >
                                         <Component />
                                     </Context.Provider>
                                 );
                             }
-
-                            // When the stream resolves later, continue walking the tree.
-                            stream$
-                                .toPromise()
-                                .then((value) => {
-                                    ReactDOMServer.renderToStaticMarkup(
-                                        <ServerContext.Provider value={{getStream, registerStream}}>
-                                            <Context.Provider
-                                                value={{
-                                                    data$: observableOf(value).pipe(map(({state}) => state)),
-                                                    name,
-                                                }}
-                                            >
-                                                <Component />
-                                            </Context.Provider>
-                                        </ServerContext.Provider>
-                                    );
-                                })
-                                .catch((error) => {
-                                    onError(error);
-                                });
                         }}
                     </ServerContext.Consumer>
                 );

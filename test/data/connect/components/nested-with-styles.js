@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import Connect from '../../../src/connect';
+import Connect from '../../../../src/connect';
 
-import NestedWithStylesContext from '../context/nested-with-styles-context';
+import NestedWithStylesContext from '../../context/nested-with-styles-context';
 import {IsoSimple} from '../isomorphic/iso-simple';
 
 const StyledSection = styled.section`

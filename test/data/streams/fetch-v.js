@@ -1,7 +1,6 @@
-import {of as observableOf} from 'rxjs';
-import {delay} from 'rxjs/operators';
+import bacon from 'baconjs';
 
 // Simulated external data source
 export default function fetchV() {
-    return observableOf(3).pipe(delay(50));
+    return bacon.later(50, 3);
 }

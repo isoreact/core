@@ -1,8 +1,8 @@
 import React from 'react';
 
-import Connect from '../../../src/connect';
+import Connect from '../../../../src/connect';
 
-import NestedContext from '../context/nested-context';
+import NestedContext from '../../context/nested-context';
 import {IsoSimple} from '../isomorphic/iso-simple';
 
 const Nested = () => (
