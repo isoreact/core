@@ -1,5 +1,8 @@
 # IsoReact &middot; [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/isoreact/core/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/@isoreact/core.svg?style=flat)](https://www.npmjs.com/package/@isoreact/core) ![npm](https://img.shields.io/npm/dw/@isoreact/core.svg) [![Build Status](https://travis-ci.org/isoreact/core.svg?branch=develop)](https://travis-ci.org/isoreact/core) [![Gitter](https://img.shields.io/gitter/room/isoreact-core/isoreact.svg)](https://gitter.im/isoreact-core/isoreact) [![PRs Welcome](https://img.shields.io/badge/pull_requests-welcome-brightgreen.svg)](https://github.com/isoreact/core/blob/master/CONTRIBUTING.md)
 
+**Important:** This library has been deprecated in favor of individual libraries, each focusing on a different state
+management library, starting with Bacon.js 1.x in [@isoreact/bacon1](https://github.com/isoreact/bacon1).
+
 IsoReact is a small library to use React and RxJS together to build isomorphic
 React components.
 
